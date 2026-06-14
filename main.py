@@ -6,7 +6,7 @@ from flask import Flask
 import telebot
 import google.generativeai as genai
 import gspread
-from oauth2client.service_account import ServiceAccountCredentials
+from google.oauth2.service_account import Credentials
 
 # 1. Initialize Flask for Render Health Checks
 app = Flask(__name__)
@@ -32,7 +32,7 @@ def get_sheets_client():
     try:
         creds_dict = json.loads(base64.b64decode(B64_CREDS).decode('utf-8'))
         scope = ['https://spreadsheets.google.com/feeds', 'https://www.googleapis.com/auth/drive']
-        creds = ServiceAccountCredentials.from_json_keyfile_dict(creds_dict, scope)
+        creds = Credentials.from_service_account_info(creds_dict, scopes=scope)
         return gspread.authorize(creds)
     except Exception as e:
         print(f"Sheet Error: {e}")
@@ -56,13 +56,13 @@ def handle_chat(message):
 
 # 5. Run the Bot and Web Server Safely
 if __name__ == "__main__":
-    # Start the Telegram bot inside a background thread so it doesn't block Render
+    # Start the Telegram bot inside a background thread
     bot_thread = threading.Thread(target=lambda: bot.infinity_polling(skip_pending=True))
     bot_thread.daemon = True
     bot_thread.start()
     print("Telegram bot started in the background...")
 
-    # Run the Flask server on the main thread so Render connects instantly
+    # Run the Flask server on the main thread
     port = int(os.environ.get("PORT", 5000))
     print(f"Web server starting on port {port}...")
     app.run(host='0.0.0.0', port=port)
