@@ -23,7 +23,7 @@ B64_CREDS = os.getenv("GOOGLE_CREDENTIALS_JSON")
 # Initialize Bot and AI
 bot = telebot.TeleBot(TOKEN)
 genai.configure(api_key=GEMINI_KEY)
-model = genai.GenerativeModel('gemini-pro')
+model = genai.GenerativeModel('gemini-1.5-flash')
 
 # 3. Google Sheets Setup
 def get_sheets_client():
